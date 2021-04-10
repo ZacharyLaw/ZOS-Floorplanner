@@ -1,0 +1,707 @@
+<!--<img src="{{url_for('static', filename='MD.png')}}">-->
+<!doctype html>
+<html>
+<head>
+<title>ZOS Floorplanner</title>
+<link rel="icon" href="/static/logo.png">
+<style>
+  #header {
+  position: fixed;
+  width: 100%;
+  color:white;
+  z-index: 3;
+  height: 6%;
+  padding: 0%;
+
+  }
+  #footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  color:white;
+  overflow-x: auto;
+  white-space: nowrap;
+  z-index: 2;
+  min-height: 13%;
+  }
+  #inventory{
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+
+  }
+  body{
+  color:white;
+  position:static !important;
+  margin: 0;
+  padding: 0;
+  overflow:hidden
+  }
+  button {
+  background-color: inherit;
+  border: none;
+  outline: none;
+  z-index: 2;
+  color:white;
+  padding: 0%;
+  }
+  td {
+  height: 5%;
+  width:15%;
+  text-align: center;
+  padding: 0%;
+
+}
+td:hover{
+  background-color:#202225;
+  cursor:pointer;
+  height:5%;
+  padding: 0%;
+
+}
+  button:hover {
+  background-color:#202225;
+  cursor:pointer;
+  height:5%;
+
+  }
+  .tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 300px;
+  background-color:#202225;
+  color:white;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  left: 50%;
+  margin-left: -270px;
+}
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+#accpage{
+	text-align: center;
+	align-items: center;
+	width:100%;
+	height:100%;
+  display: none;
+	top:25%;
+	position: absolute;
+	overflow-y: hidden;
+  z-index: 3;
+  background-color:#36393F ;
+
+}
+</style>
+</style>
+</head>
+<body style="background-color:#36393F;">
+
+<div id="header" style="background-color:#2F3136;">
+<table style="width: 100%; height: 100%;" >
+<tr>
+<td onclick="window.location='http://github.com/ZacharyLaw/Zak#zak-'"><h1><img src="{{url_for('static', filename='logo.png')}}" style="width: 25px;top: 0px;"></img>Floorplanner</h1></td>
+<td onclick="downloadString()">DOWNLOAD PROJECT</td>
+<td id="download" href="#" style="color:white">DOWNLOAD IMAGE</td>
+{% if email %}
+<td id="save2acc">SAVE TO ACCOUNT</td>
+<td>{{email}} <img id="user" src="{{url_for('static', filename='user.png')}}" style="width:20px"></td>
+{%endif%}
+{% if not email %}
+<td id='acc' href=http://localhost:8000/login>Account<img id="user" src="{{url_for('static', filename='user.png')}}" style="width:20px"></td>
+{%endif%}
+</tr>
+</table>
+</div>
+
+<form action = http://localhost:8000/save method = "POST" style="display: none;">
+{% if email %}
+<input type="text" name="Email" value="{{email}}">
+{%endif%}
+<input id ="jsoninput" type="text" name="Json">
+<input type="submit" id="sendjson" value="Submit">
+</form>
+
+<br><br><br><div id="c" style="position: fixed" ondrop="json(event);" ondragover="dragOverHandler(event);"></div>
+<div class="tooltip" style="position: absolute;top: 6%;left:93%">EDIT TIPS<span class="tooltiptext">Drag to move<br>Double tap to remove<br>Drag and zoom background like map<br>Drop project file here to import<br>Hold right mouse button to draw cursor box select module<br>Ctrl C to clone selected module<br>Delete/Backspace to remove selected module<br>Ctrl Z / Ctrl Shift Z to undo / redo (beta)</span></div>
+<div id="footer" style="background-color:#2F3136;">
+Inventory: Click to insert&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="myInput" onkeyup="search()" placeholder="Search module.." >
+<button class="category" id="tile" style="float: right;"><img src="{{url_for('static', filename='tile2.png')}}" width="30" height="30"></button>
+&nbsp;<button class="category" id="furniture" style="float: right;"><img src="{{url_for('static', filename='furniture2.png')}}" width="30" height="30"></button>
+&nbsp;<button class="category" id="kitchen" style="float: right;"><img src="{{url_for('static', filename='kitchen2.png')}}"  width="30" height="30"></button>
+<button class="category" id="all" style="float: right; color: white;">ALL</button>
+<button  style="float: right; color: white;   background-color: #2F3136;">Category: </button>
+<div id="inventory" style="position: absolute; bottom: 0%;">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img class="inven tile" src="{{url_for('static', filename='square.png')}}" width="50">
+<img class="inven tile" src="{{url_for('static', filename='circle.png')}}" width="50">
+<img class="inven kitchen" src="{{url_for('static', filename='bathtub.png')}}" width="50">
+<img class="inven furniture" src="{{url_for('static', filename='bed.png')}}" width="50">
+<img class="inven furniture" src="{{url_for('static', filename='books.png')}}" width="50">
+<img class="inven furniture" src="{{url_for('static', filename='chair.png')}}" width="50">
+<img class="inven furniture" src="{{url_for('static', filename='couch.png')}}" width="50">
+<img class="inven furniture" src="{{url_for('static', filename='dbed.png')}}" width="50">
+<img class="inven kitchen" src="{{url_for('static', filename='dsink.png')}}" width="50">
+<img class="inven furniture" src="{{url_for('static', filename='piano.png')}}" width="50">
+<img class="inven kitchen" src="{{url_for('static', filename='sink.png')}}" width="50">
+<img class="inven furniture" src="{{url_for('static', filename='tv.png')}}" width="50">
+</div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://unpkg.com/konva@7.0.4/konva.min.js"></script>
+<script>
+var blockSize = 50;
+var usage=0;
+var energy=0;
+var percent=0;
+var recentmodule;
+const history=[];
+let ver=0
+var ship;
+var stage = new Konva.Stage({
+  container: 'c',
+  width: window.innerWidth,
+  height: window.innerHeight,
+});
+var tr = new Konva.Transformer({
+    borderStroke:'lightblue',
+    padding:10,
+  });
+var layer = new Konva.Layer();
+var group = new Konva.Group({});
+layer.add(group);
+stage.draggable(true);
+stagesetup(stage)
+window.addEventListener('resize', fitStageIntoParentContainer);
+document.addEventListener('contextmenu', event => event.preventDefault());
+$( document ).ready( function() {
+{% if jsontxt %}
+var jsonstr='{{jsontxt}}'
+stage = Konva.Node.create(jsonstr.replaceAll(/\&#34;/gm,'"'), 'c');
+stage.find('Image').forEach(imageNode => {
+const nativeImage = new window.Image();
+nativeImage.onload = () => {
+imageNode.image(nativeImage);
+stagesetup(stage);
+moduleimage(imageNode,1);
+imageNode.getLayer().batchDraw();}
+nativeImage.src = imageNode.getAttr('source');})
+stage.batchDraw();
+{%endif%}
+$("#save2acc").click(function(event){
+$("#jsoninput").val(stage.toJSON())
+$("#sendjson").click()
+})
+$("#acc").click(function(event){
+  window.location.replace("http://localhost:8000/account");
+})
+$( ".inven" ).click( function(event) {
+    var imageObj = new Image();
+      imageObj.src = $(this).attr("src");
+      imageObj.eng = $(this).attr("eng");
+      imageObj.rad = $(this).attr("rad");
+      imageObj.color = $(this).attr("color");
+      imageObj.w = $(this).attr("width");
+      imageObj.h = $(this).attr("width");
+      imageObj.source = $(this).attr("src");
+      imageObj.onload = function () {
+        drawImage(imageObj);
+    save()
+      };
+    engadd($(this).attr("eng"));
+recentmodule=imageObj;
+});
+$('.category').click( function(event) {
+  if ($(this).attr('id')=="all"){$(".tile, .furniture, .kitchen").show();
+  }else{$(".tile, .furniture, .kitchen").hide();
+  $("."+$(this).attr('id')).show();}});
+$("#download").click(function () {
+  var oldscale=stage.scale();
+    var oldx=stage.x();
+    var oldy=stage.y();
+    var leftest=stage.find('Image')[0].x();
+    var rightest=stage.find('Image')[0].x()+stage.find('Image')[0].width();
+    var uppest=stage.find('Image')[0].y();
+    var lowest=stage.find('Image')[0].y()+stage.find('Image')[0].height();
+    stage.find('Image').forEach(img=>{
+      rightest=Math.max(rightest,img.x()+stage.find('Image')[0].width());
+      leftest=Math.min(leftest,img.x());
+      uppest=Math.min(rightest,img.y());
+      lowest=Math.max(leftest,img.y()+stage.find('Image')[0].height());
+    })
+    console.log(lowest)
+    stage.scale({x:1,y:1});
+    stage.x(leftest);
+    stage.y(uppest);
+    stage.width(Math.abs(leftest)+Math.abs(rightest))
+    stage.height(Math.abs(uppest)+Math.abs(lowest))
+    var image = trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream");
+    var anchor = document.createElement('a');
+    anchor.setAttribute('download', 'builder.png');
+    anchor.setAttribute('href', image);
+    anchor.click();
+    stage.scale(oldscale);
+    //stage.x(oldx);
+    //stage.y(oldy);
+    //stage.width(window.innerWidth);
+    //stage.height(window.innerHeight);
+    //layer.batchDraw();
+    });
+$("#nav img").click(function () {
+  $("#nav").toggle();
+
+  var imageObj = new Image();
+      imageObj.src = $(this).attr("src");
+
+      imageObj.onload = function () {
+        var w=this.width*125/202;
+        var h=this.height*125/202;
+
+        ship = new Konva.Image({
+image: imageObj,
+width: w,
+height: h,
+
+});
+layer.add(ship);
+stage.add(layer);
+ship.moveToBottom();
+      };
+});
+$(document).keydown(function(e){
+  if (e.which === 90 && e.ctrlKey && e.shiftKey){undo(1)
+  }else if (e.which === 90 && e.ctrlKey){undo()}})
+});//ready
+//function download(){$("#download").attr("download","build.png").attr("href",trimCanvas().toDataURL("image/png").replace(/^data:image\/png/,"data:application/octet-stream"))}
+function nav() {$("#nav").toggle()}
+function save(){
+  ver+=1;
+  history.splice(ver-1,history.length-ver,stage.toJSON()+"#"+usage+"#"+energy+"#"+percent)
+}
+function undo(redo){
+stage.find('#circle').each(function(circle){
+  circle.destroy();
+})
+
+if (!redo && ver!=1){ver-=1}
+else if (redo && ver!=history.length){ver+=1}
+version=history[ver-1];
+var string=version.split("#");
+stage.destroyChildren();
+layer.destroyChildren();
+$("canvas").remove();
+window.stage = Konva.Node.create(string[0], 'c');
+stage.find('Image').forEach(imageNode => {
+const nativeImage = new window.Image();
+nativeImage.onload = () => {
+imageNode.image(nativeImage);
+moduleimage(imageNode,1);
+imageNode.getLayer().batchDraw();}
+nativeImage.src = imageNode.getAttr('source');
+window.layer=imageNode.getLayer();
+})
+stagesetup(stage);
+usage=parseInt(string[1]);
+energy=parseInt(string[2]);
+percent=parseInt(string[3]);
+$("output").html(percent+"% "+usage+"/"+energy);
+stage.batchDraw();
+}
+function getRelativePointerPosition(node) {
+        var transform = node.getAbsoluteTransform().copy();
+        transform.invert();
+        var pos = stage.getPointerPosition();
+        return transform.point(pos);
+      }
+function stagesetup(stage){
+  var tr = new Konva.Transformer({
+    borderStroke:'lightblue',
+    padding:10,
+  });
+  var group = new Konva.Group({});
+layer.add(group);
+      layer.add(tr);
+      layer.draw();
+      var selectionRectangle = new Konva.Rect({
+        fill: 'lightblue',
+        opacity: 0.2,
+      });
+      layer.add(selectionRectangle);
+      var x1, y1, x2, y2;
+      stage.on('mousedown touchstart', (e) => {
+        if (event.which!=3){
+          return;
+          }else if (e.target !== stage) {
+          return;
+        }
+        x1 = getRelativePointerPosition(group).x;
+        y1 = getRelativePointerPosition(group).y;
+        x2 = getRelativePointerPosition(group).x;
+        y2 = getRelativePointerPosition(group).y;
+        selectionRectangle.visible(true);
+        selectionRectangle.width(0);
+        selectionRectangle.height(0);
+        layer.draw();
+      });
+      stage.on('mousemove touchmove', () => {
+        if (event.which!=3){
+          return;
+          }else if (!selectionRectangle.visible()) {
+          return;
+        }
+        x2 = getRelativePointerPosition(group).x;
+        y2 = getRelativePointerPosition(group).y;
+        selectionRectangle.setAttrs({
+          x: Math.min(x1, x2),
+          y: Math.min(y1, y2),
+          width: Math.abs(x2 - x1),
+          height: Math.abs(y2 - y1),
+        });
+        layer.batchDraw();
+      });
+      stage.on('mouseup touchend', () => {
+        if (event.which!=3){
+          return;
+          }else if (!selectionRectangle.visible()) {
+          return;
+        }
+        setTimeout(() => {
+          selectionRectangle.visible(false);
+          layer.batchDraw();
+        });
+
+        var shapes = stage.find('Image').toArray();
+        var box = selectionRectangle.getClientRect();
+        var selected = shapes.filter((shape) =>
+          Konva.Util.haveIntersection(box, shape.getClientRect())
+        );
+        tr.nodes(selected);
+        layer.batchDraw();
+      });
+      stage.on('click tap', function (e) {
+if (selectionRectangle.visible()) {
+          return;
+        }
+        if (e.target === stage) {
+          tr.nodes([]);
+          layer.draw();
+          return;        }
+        if (!e.target.hasName('Image')) {
+          return;}
+        const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
+        const isSelected = tr.nodes().indexOf(e.target) >= 0;
+
+        if (!metaPressed && !isSelected) {
+          tr.nodes([e.target]);
+        } else if (metaPressed && isSelected) {
+          const nodes = tr.nodes().slice(); // use slice to have new copy of array
+          nodes.splice(nodes.indexOf(e.target), 1);
+          tr.nodes(nodes);
+        } else if (metaPressed && !isSelected) {
+          const nodes = tr.nodes().concat([e.target]);
+          tr.nodes(nodes);
+        }
+        layer.draw();
+      });
+
+$(document).keydown(function(e) {//8 46
+if (e.keyCode == 67 && e.ctrlKey) {
+tr.nodes().forEach(function(entry) {
+var clone=entry.clone()
+moduleimage(clone);
+layer.add(clone);
+engadd(clone.attrs.eng)
+});
+save()
+}else if  (e.keyCode == 8 || e.keyCode==46){
+  tr.nodes().forEach(function(entry) {
+    entry.destroy();
+    selectionRectangle.visible(false);
+
+    layer.batchDraw();
+    engremove(entry.attrs.eng);
+  });
+
+}
+
+})
+stage.on('click', (e) => {
+if (event.which==1 && recentmodule){
+  if(e.target === stage || e.target===ship)
+  var img = new Konva.Image({
+image: recentmodule,
+draggable: true,
+eng: recentmodule.eng,
+source: recentmodule.src,
+rad:recentmodule.rad,
+color:recentmodule.color,
+x: Math.round(getRelativePointerPosition(group).x / blockSize) * blockSize,
+y: Math.round(getRelativePointerPosition(group).y / blockSize) * blockSize,
+
+});
+         
+moduleimage(img);
+layer.add(img);
+stage.add(layer);
+  engadd(img.attrs.eng);
+  save();
+          }
+
+
+});
+stage.on('dragmove',()=>{document.body.style.cursor='move'});
+stage.on('dragend',()=>{document.body.style.cursor='default'});
+stage.on('wheel', (e) => {
+e.evt.preventDefault();
+var oldScale = stage.scaleX();
+var pointer = stage.getPointerPosition();
+var mousePointTo = {x: (pointer.x - stage.x()) / oldScale,y: (pointer.y - stage.y()) / oldScale,};
+var newScale =e.evt.deltaY > 0 ?  oldScale / 1.1: oldScale * 1.1;
+stage.scale({ x: newScale, y: newScale });
+var newPos = {x: pointer.x - mousePointTo.x * newScale,y: pointer.y - mousePointTo.y * newScale,};
+stage.position(newPos);
+stage.batchDraw();
+});}//stagesetup
+function json(ev) {
+ev.preventDefault();
+reader = new FileReader();
+reader.onload = function (event) {
+var string=event.target.result.split("#");
+stage = Konva.Node.create(string[0], 'c');
+stage.find('Image').forEach(imageNode => {
+const nativeImage = new window.Image();
+nativeImage.onload = () => {
+imageNode.image(nativeImage);
+stagesetup(stage);
+moduleimage(imageNode,1);
+usage=parseInt(string[1]);
+energy=parseInt(string[2]);
+percent=parseInt(string[3]);
+imageNode.getLayer().batchDraw();}
+nativeImage.src = imageNode.getAttr('source');})
+stage.batchDraw();};
+reader.readAsText(ev.dataTransfer.files[0]);
+}//json
+function dragOverHandler(ev){ev.preventDefault();}
+function downloadString() {
+  var text=stage.toJSON()+"#"+usage+"#"+energy+"#"+percent;
+  var fileType="text/txt";
+  var fileName="build.project";
+  var blob = new Blob([text], { type: fileType });
+  var a = document.createElement('a');
+  a.download = fileName;
+  a.href = URL.createObjectURL(blob);
+  a.dataset.downloadurl = [fileType, a.download, a.href].join(':');
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function() { URL.revokeObjectURL(a.href); }, 1500);
+}
+function fitStageIntoParentContainer() {
+  stage.width(window.innerWidth)
+  stage.height(window.innerHeight)}
+function search() {
+  if (document.getElementById("myInput").value==""){$("img").show();}
+  var  li, a, i, txtValue;
+  list = document.getElementsByClassName("inven");
+  for (i = 0; i < list.length; i++) {
+    txtValue = list[i].src.replace(".png","");
+    if (txtValue.toUpperCase().indexOf(document.getElementById("myInput").value.toUpperCase()) > -1 && list[i].style.display == "") {
+      list[i].style.display = "";
+    } else {
+      list[i].style.display = "none";
+    }
+  }
+}
+function drawImage(imageObj) {
+var img = new Konva.Image({
+image: imageObj,
+draggable: true,
+eng: imageObj.eng,
+source: imageObj.src,
+rad:imageObj.rad,
+color:imageObj.color
+});
+moduleimage(img);
+layer.add(img);
+stage.add(layer);
+
+}//drawimage
+function moduleimage(img,json){
+  img.on('dragmove mouseover mouseout dblclick dbltap dragend ', (e) => {
+  layer=img.getLayer()
+
+switch(e.type) {
+  case 'dragmove':
+    //img.position({
+    //x: Math.round(img.x() / blockSize) * blockSize,
+    //y: Math.round(img.y() / blockSize) * blockSize});
+    //layer.batchDraw();
+    break;
+  case 'dragend':
+  img.position({
+    x: Math.round(img.x() / blockSize) * blockSize,
+    y: Math.round(img.y() / blockSize) * blockSize});
+    layer.batchDraw();
+    save();
+    break;
+  case 'mouseover':
+  document.body.style.cursor='move';
+    break;
+  case 'mouseout':
+  document.body.style.cursor='default';
+    break;
+  case 'dblclick':
+  case 'dbltap':
+    img.destroy();
+    stage.draw();
+    document.body.style.cursor = 'default';
+    engremove(img.attrs.eng);
+    save()
+    break;
+}});
+  if (img.attrs.rad){
+    var circle = new Konva.Circle({
+  id:circle,
+  x:img.x()+img.width()/2,
+  y:img.y()+img.height()/2,
+  radius: img.attrs.rad,
+  fill: img.attrs.color,
+  opacity: 0.2,});
+hitbox=img.clone({});
+if (json){layer=img.getLayer()};
+  hitbox.on('mouseover',function(){document.body.style.cursor='move';});
+  hitbox.on('mouseout',function(){document.body.style.cursor='default';});
+  hitbox.on('dragmove', (e) => {
+  hitbox.position({
+  x: Math.round(hitbox.x() / blockSize) * blockSize,
+  y: Math.round(hitbox.y() / blockSize) * blockSize});
+  img.position({x: hitbox.x(),y: hitbox.y()});
+  circle.position({x: hitbox.x()+img.width()/2,y: hitbox.y()+img.height()/2,});
+  layer.batchDraw();
+  save()
+  });
+  img.on('mouseover', function () {   
+  layer.add(circle);
+  layer.add(hitbox);
+  layer.draw();
+  });
+  img.on('dragmove', (e) => {
+  img.position({
+  x: Math.round(hitbox.x() / blockSize) * blockSize,
+  y: Math.round(hitbox.y() / blockSize) * blockSize});
+  hitbox.position({x: hitbox.x(),y: hitbox.y()});
+  circle.position({x: hitbox.x()+img.width()/2,y: hitbox.y()+img.height()/2,});
+  layer.batchDraw();
+  save()
+  });
+circle.on('mouseover',function(){
+  circle.remove();
+  layer.batchDraw();
+
+})
+  hitbox.on('mouseout', function () {
+  circle.remove();
+  hitbox.remove();
+  layer.batchDraw();
+  });
+  hitbox.on('dblclick dbltap',function () {
+  img.destroy();
+  circle.destroy();
+  hitbox.destroy();
+  layer.batchDraw();
+  document.body.style.cursor = 'default';
+  if (img.attrs.eng<0){usage-=img.attrs.eng*(-1);
+  }else{energy-=img.attrs.eng;}
+  if(usage==0){percent=0;
+  }else if(energy/usage*100>100){percent=100;
+  }else{percent=Math.round(energy/usage*100);}
+  $("output").html(percent+"% "+usage+"/"+energy);
+  save()
+  });
+
+
+}}
+function engadd(eng){
+if(eng<0){usage+=eng*(-1)
+}else{energy+=eng*(1)}
+if(usage==0){percent=0
+}else if(energy/usage*100>100){percent=100
+}else{percent=Math.round(energy/usage*100)}
+$("output").html(percent+"% "+usage+"/"+energy)
+}
+function engremove(eng){
+if (eng<0){
+usage-=eng*(-1);
+}else{energy-=eng*(1);}
+if(usage==0){percent=0;
+}else if(energy/usage*100>100){percent=100;}
+else{percent=Math.round(energy/usage*100);}
+$("output").html(percent+"% "+usage+"/"+energy);
+}
+function trimCanvas(c) {
+
+var c=$('canvas')[0]
+
+
+    var ctx = c.getContext('2d');
+    var copy =  document.createElement('canvas').getContext('2d');
+    var    pixels = ctx.getImageData(0, 0, c.width, c.height);
+        var    l = pixels.data.length;
+        var    i;
+        var    bound = {
+            top: null,
+            left: null,
+            right: null,
+            bottom: null
+        };
+        var    x, y;
+    for (i = 0; i < l; i += 4) {
+        if (pixels.data[i + 3] !== 0) {
+            x = (i / 4) % c.width;
+            y = ~~((i / 4) / c.width);
+
+            if (bound.top === null) {
+                bound.top = y;
+            }
+
+            if (bound.left === null) {
+                bound.left = x;
+            } else if (x < bound.left) {
+                bound.left = x;
+            }
+
+            if (bound.right === null) {
+                bound.right = x;
+            } else if (bound.right < x) {
+                bound.right = x;
+            }
+
+            if (bound.bottom === null) {
+                bound.bottom = y;
+            } else if (bound.bottom < y) {
+                bound.bottom = y;
+            }
+        }
+    }
+    var trimHeight = bound.bottom - bound.top,
+        trimWidth = bound.right - bound.left,
+        trimmed = ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
+    copy.canvas.width = trimWidth+1*1;
+    copy.canvas.height = trimHeight+1*1;
+    copy.putImageData(trimmed, 0, 0);
+    return copy.canvas;
+
+}
+</script>
+</body>
+</html>
