@@ -86,7 +86,7 @@ max-width: 400px !important;}
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {% if email %}
-            <li><a style="color: white" id="save2acc nav-link">SAVE TO ACCOUNT</a></li>
+            <li><a id="save2acc" style="color: white" id="save2acc nav-link">SAVE TO ACCOUNT</a></li>
             <li><a style="color: white" class="nav-link" href=http://localhost:8000>{{email}} <img id="user" src="{{url_for('static', filename='exit.png')}}" style="width:20px"></a></li>
             {%endif%}
             {% if not email %}
@@ -107,7 +107,7 @@ max-width: 400px !important;}
 <div id="c" style="position: fixed;" ondrop="json(event);" ondragover="dragOverHandler(event);"></div>
 <button class=" btn btn-success btn-md " style="position: relative;top: 8%;left:89%;background-color: #2F3136;border:none">EDIT TIPS</button>
 <div id="footer" style="background-color:#2F3136;">
-Inventory: Click to insert&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="myInput" onkeyup="search()" placeholder="Search module.." >
+Inventory: Click to insert&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input style="color:black" type="text" id="myInput" onkeyup="search()" placeholder="Search module.." >
 <button class="category" id="tile" style="float: right;"><img src="{{url_for('static', filename='tile2.png')}}" width="30" height="30"></button>
 &nbsp;<button class="category" id="furniture" style="float: right;"><img src="{{url_for('static', filename='furniture2.png')}}" width="30" height="30"></button>
 &nbsp;<button class="category" id="kitchen" style="float: right;"><img src="{{url_for('static', filename='kitchen2.png')}}"  width="30" height="30"></button>
