@@ -87,7 +87,7 @@ max-width: 400px !important;}
           <ul class="nav navbar-nav navbar-right">
             {% if email %}
             <li><a style="color: white" id="save2acc nav-link">SAVE TO ACCOUNT</a></li>
-            <li><a style="color: white" class="nav-link" href=http://localhost:8000>{{email}} <img id="user" src="{{url_for('static', filename='user.png')}}" style="width:20px"></a></li>
+            <li><a style="color: white" class="nav-link" href=http://localhost:8000>{{email}} <img id="user" src="{{url_for('static', filename='exit.png')}}" style="width:20px"></a></li>
             {%endif%}
             {% if not email %}
             <li><a style="color: white" class="nav-link" id='acc' href=http://localhost:8000/account>Account <img id="user" src="{{url_for('static', filename='user.png')}}" style="width:20px"></a></li>
