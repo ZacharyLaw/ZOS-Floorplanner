@@ -35,7 +35,7 @@ def login():
         if len(request.form)==3:
             if request.form['Password']!=request.form['Confirm Password']:
                 error = 'Invalid Confirm Password. Please try again.'
-            elif c.fetchone():
+            elif result:
                 error = 'Account already made. Please try again.'
             else:
                 c.execute("""INSERT INTO user VALUES (?,?,?)""",(request.form['Email'], request.form['Password'],None))
