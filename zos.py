@@ -2,6 +2,8 @@
 python3 ./hello.py
 py -m pip install flask
 '''
+from datetime import date
+from datetime import timedelta
 from flask import Flask, render_template, request,redirect,url_for
 import sqlite3
 app=Flask(__name__)
@@ -10,8 +12,19 @@ def create():
     conn = sqlite3.connect('user.db')
     c = conn.cursor()
     c.execute("CREATE TABLE user(email TEXT PRIMARY KEY,password TEXT,json TEXT);")
-    print('done')
+@app.route('/create2')
+def create2():
+    conn = sqlite3.connect('user.db')
+    c = conn.cursor()
+    c.execute("CREATE TABLE share(email TEXT,title TEXT,date TEXT,json TEXT);")
 @app.route('/')
+def frontpage():
+    conn = sqlite3.connect('user.db')
+    c = conn.cursor()
+    c.execute("SELECT *  FROM share")
+    share=c.fetchall()
+    return render_template('frontpage.html',share=share)
+@app.route('/planner')
 def planner():
     return render_template('planner.html')
 @app.route('/account/<email>')
@@ -21,9 +34,19 @@ def userplanner(email=None):
 def save():
     conn = sqlite3.connect('user.db')
     c = conn.cursor()
-    c.execute("UPDATE user SET json = ? WHERE email = ?",(request.form['Json'],request.form['Email']))
+    c.execute("UPDATE share SET json = ? WHERE email = ?",(request.form['Json'],request.form['Email']))
     conn.commit()
     return render_template('planner.html',email=request.form['Email'],jsontxt=request.form['Json'])
+@app.route('/share', methods=['GET', 'POST'])
+def share():
+    conn = sqlite3.connect('user.db')
+    c = conn.cursor()
+    c.execute("INSERT INTO share VALUES(?,?,?,?)",(request.form['Email'],request.form['Email']+'"s Floorplan',date.today()+timedelta(days=1),request.form['Json']))#+timedelta(days=1)
+    conn.commit()
+    return render_template('planner.html',email=request.form['Email'],jsontxt=request.form['Json'])
+@app.route('/open', methods=['GET', 'POST'])
+def open():
+    return render_template('planner.html',jsontxt=request.form['Json'])
 @app.route('/account', methods=['GET', 'POST'])
 def login():
     conn = sqlite3.connect('user.db')
